@@ -1,6 +1,0 @@
-# Pseudocode
-
-```txt
-
-
-```
