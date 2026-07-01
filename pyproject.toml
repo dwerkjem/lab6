@@ -1,15 +1,16 @@
 [project]
-name = "Lab6"
-version = "0.1.0"
-description = "Fountain View Hall"
+name = "lab4"
+version = "0.2.0"
+description = "This is a CRUD compliant event booking cli for Fountain View Hall"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "pandas",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=. --cov-report=term-missing --cov-report=html"
+addopts = "--cov=lab4 --cov-report=term-missing --cov-report=html"
 log_cli = false
 log_level = "WARNING"
 filterwarnings = [
@@ -31,11 +32,10 @@ dev = [
     "lefthook>=2.1.9",
     "pytest>=9.0.3",
     "pytest-cov>=7.1.0",
-
 ]
 
 [project.scripts]
-main = "src.main:main"
+fvh-manager = "src.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]

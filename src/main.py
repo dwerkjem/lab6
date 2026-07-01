@@ -1,123 +1,161 @@
 """
 Name: Derek R. Neilson
-Description: Computer Haven Seminar Registration System
+Description: Fountain View Hall's event attendance & revenue tracker.
+
+Pseudo code
+Declare variables for:
+guests, events, revenue and largest event
+
+Make constants for:
+Large events by customer count, discount percent for large events
+
+Main loop:
+
+    get input for event name
+
+    set guest count and projected revenue to something in loop range.
+
+    start guest loop:
+        try to cast guest count to an integer
+        loop until valid or sentinel value
+
+    start revenue loop
+        try to cast revenue count to an integer
+        loop until valid or sentinel value
+    Calculate Discount
+
+    increment event count, total guest, and total revenue
+    check if it was the largest and if so store it as such
+    append all info to data frame
+    print formatted
 """
 
 import pandas as pd
-import src.plotting
 
 
-def cost_per_attendee_calc(attendees: int) -> int:
-    """Calculates the cost per an attendee
+def main():
+    total_events = 0
+    total_guests = 0
+    total_projected_revenue = 0.0
+    total_discount_amount = 0.0
+    largest_event = 0
 
-    Args:
-        attendees (int): number of attendees
+    events = []
 
-    Returns:
-        int: the cost per each attendee
-    """
+    LARGE_GUEST_AMOUNT = 60
+    LARGE_GUEST_DISCOUNT_PERCENT = 0.80  # Customer pays 80%.
 
-    if attendees <= 0:
-        cost_per_attendee = 0
-    elif attendees < 4:
-        cost_per_attendee = 150
-    elif 4 <= attendees < 10:
-        cost_per_attendee = 100
-    elif attendees >= 10:
-        cost_per_attendee = 90
-    return cost_per_attendee
+    while True:
+        event_name = input(
+            "What is the name of your event?\nEnter a name or done to quit: "
+        ).strip()
 
-
-def main() -> None:
-    """main for Computer Haven Seminar Registration System
-
-    Raises:
-        OverflowError: when there is too many people in the room to hold the requested amount
-    Arguments:
-        None
-    Returns:
-        None
-    """
-    total_revenue = 0
-    largest_company = ""
-    largest_company_size = 0
-    largest_company_revue = 0
-    number_of_companies = 0
-    total_attendees = 0
-    run = True
-    companies = []
-    while run:
-        company_name = input("What is your companies name?\nEnter 'done' to quit: ")
-        if company_name.lower() == "done":
+        if event_name.lower() == "done":
             break
-        while True:
+
+        guest_count = -1
+        projected_revenue_before_discount = -1.0
+
+        # Every booking must include a valid guest count.
+        while guest_count <= 0:
             try:
-                attendees = int(
+                guest_count = int(
                     input(
-                        f"How many are attending from {company_name}?\nenter zero to quit: "
+                        "\nHow many guests are attending the event?\n"
+                        "Enter a positive integer, eg. 53: "
                     )
                 )
 
-                if attendees + total_attendees > 125:
-                    raise OverflowError(
-                        f"There are not enough space available {125 - total_attendees} seats are left please select less than that or enter zero to quit"
-                    )
+                if guest_count <= 0:
+                    print("Guest count must be greater than zero.")
 
-                if attendees == 0:
-                    break
-                total_attendees += attendees
-                break
             except ValueError:
-                print("Please type a whole number ie.(45)")
-            except OverflowError as err:
-                print(err)
-        cost_per_attendee = cost_per_attendee_calc(attendees)
-        registration_cost = attendees * cost_per_attendee
-        if attendees > largest_company_size:
-            largest_company_size = attendees
-            largest_company = company_name
-            largest_company_revue = registration_cost
-        # Attendees should be a valid int by now
-        total_revenue += registration_cost
-        print(f"That will cost {company_name} ${registration_cost:,.2f}")
-        number_of_companies += 1
-        companies.append(
+                print("Please enter a valid whole number for guest count.")
+
+        # Assumption: the user enters the booking total before any discount is applied.
+        while projected_revenue_before_discount < 0:
+            try:
+                projected_revenue_before_discount = float(
+                    input(
+                        "\nHow much revenue do you estimate before discounts?\n"
+                        "Enter a number, eg. 53.50: "
+                    )
+                )
+
+                if projected_revenue_before_discount < 0:
+                    print("Projected revenue cannot be negative.")
+
+            except ValueError:
+                print("Please enter a valid number for projected revenue.")
+
+        discount_amount = 0.0
+        final_projected_revenue = projected_revenue_before_discount
+
+        # Large events receive a 20% discount.
+        if guest_count >= LARGE_GUEST_AMOUNT:
+            discount_amount = projected_revenue_before_discount * (
+                1 - LARGE_GUEST_DISCOUNT_PERCENT
+            )
+            final_projected_revenue = (
+                projected_revenue_before_discount * LARGE_GUEST_DISCOUNT_PERCENT
+            )
+
+            print(
+                f"{event_name} receives a {discount_amount:,.2f} discount "
+                "because it is a large event."
+            )
+
+        total_events += 1
+        total_guests += guest_count
+        total_projected_revenue += final_projected_revenue
+        total_discount_amount += discount_amount
+
+        if guest_count > largest_event:
+            largest_event = guest_count
+
+        # Store each event so pandas can display the event data later.
+        events.append(
             {
-                "Company Name": company_name,
-                "Attendees": attendees,
-                "Cost bracket": cost_per_attendee,
-                "Cost": registration_cost,
+                "Event Name": event_name,
+                "Guests": guest_count,
+                "Revenue Before Discount": projected_revenue_before_discount,
+                "Discount Amount": discount_amount,
+                "Final Projected Revenue": final_projected_revenue,
             }
         )
-        if run:
-            another_company = input(
-                "Should another company be entered?\nY or N: "
-            ).upper()
-            while run and (another_company != "Y" and another_company != "N"):
-                another_company = input(
-                    "Should another company be entered?\nY or N only please: "
-                ).upper()
-            if another_company == "N":
-                run = False
-                break
-    try:
-        average = total_revenue / number_of_companies
-    except ZeroDivisionError:
-        average = 0
-    print()
-    print(pd.DataFrame(companies))
-    print()
-    print(f"Companies Registered: {number_of_companies}")
-    print(f"Total Attendees: {total_attendees}")
-    print(f"Total Revenue: ${total_revenue:,.2f}")
-    print(f"Average Revenue Per Attendee: ${average}")
-    print(
-        f"Largest company was {largest_company} with {largest_company_size} attendees and costed {largest_company_revue}"
-    )
-    should_plot = input("Do you want a graph?\nYes or No: ").lower()
-    if should_plot == "yes":
-        src.plotting.seminar_plots(companies)  # pragma: no cover
+
+    if total_events > 0:
+        average_guests = total_guests / total_events
+        average_revenue = total_projected_revenue / total_events
+    else:
+        average_guests = 0
+        average_revenue = 0
+
+    event_dataframe = pd.DataFrame(events)
+
+    print("\nEvent Data")
+    print("-" * 65)
+
+    if event_dataframe.empty:
+        print("No events were entered.")
+    else:
+        print(
+            event_dataframe.to_string(index=False)
+        )  # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_string.html#pandas.DataFrame.to_string
+
+    print(f"""
+Event Revenue Summary
+{"-" * 65}
+Events Processed: {total_events}
+Total Guests: {total_guests:,}
+Total Revenue: ${total_projected_revenue:,.2f}
+Total Discounts Given: ${total_discount_amount:,.2f}
+Average Guests Per Event: {average_guests:,.2f}
+Average Revenue Per Event: ${average_revenue:,.2f}
+Largest Event: {largest_event:,} Guests
+{"-" * 65}
+""")
 
 
 if __name__ == "__main__":
-    main()  # pragma: no cover
+    main()
