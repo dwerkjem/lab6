@@ -1,16 +1,17 @@
 [project]
-name = "lab4"
+name = "lab6"
 version = "0.2.0"
 description = "This is a CRUD compliant event booking cli for Fountain View Hall"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pandas",
+    "plotly"
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=lab4 --cov-report=term-missing --cov-report=html"
+addopts = "--cov=lab6 --cov-report=term-missing --cov-report=html"
 log_cli = false
 log_level = "WARNING"
 filterwarnings = [

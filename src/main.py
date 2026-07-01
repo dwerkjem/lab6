@@ -32,105 +32,59 @@ Main loop:
 
 import pandas as pd
 
-
-def main():
-    total_events = 0
-    total_guests = 0
-    total_projected_revenue = 0.0
-    total_discount_amount = 0.0
-    largest_event = 0
-
-    events = []
-
-    LARGE_GUEST_AMOUNT = 60
-    LARGE_GUEST_DISCOUNT_PERCENT = 0.80  # Customer pays 80%.
-
-    while True:
-        event_name = input(
+def get_event_information():
+    event_name = input(
             "What is the name of your event?\nEnter a name or done to quit: "
         ).strip()
-
-        if event_name.lower() == "done":
-            break
-
-        guest_count = -1
-        projected_revenue_before_discount = -1.0
-
-        # Every booking must include a valid guest count.
-        while guest_count <= 0:
-            try:
-                guest_count = int(
+    
+    return event_name
+   
+def get_client_information(guest_count):
+    while guest_count <= 0:
+        try:
+            guest_count = int(
                     input(
                         "\nHow many guests are attending the event?\n"
                         "Enter a positive integer, eg. 53: "
                     )
                 )
 
-                if guest_count <= 0:
-                    print("Guest count must be greater than zero.")
+            if guest_count <= 0:
+                print("Guest count must be greater than zero.")
 
-            except ValueError:
-                print("Please enter a valid whole number for guest count.")
+        except ValueError:
+            print("Please enter a valid whole number for guest count.")
+    return guest_count
 
-        # Assumption: the user enters the booking total before any discount is applied.
-        while projected_revenue_before_discount < 0:
-            try:
-                projected_revenue_before_discount = float(
+def calculate_event_charge(projected_revenue_before_discount):
+    while projected_revenue_before_discount < 0:
+        try:
+            projected_revenue_before_discount = float(
                     input(
                         "\nHow much revenue do you estimate before discounts?\n"
                         "Enter a number, eg. 53.50: "
                     )
                 )
 
-                if projected_revenue_before_discount < 0:
-                    print("Projected revenue cannot be negative.")
+            if projected_revenue_before_discount < 0:
+                print("Projected revenue cannot be negative.")
 
-            except ValueError:
-                print("Please enter a valid number for projected revenue.")
+        except ValueError:
+            print("Please enter a valid number for projected revenue.")
+    return projected_revenue_before_discount
 
-        discount_amount = 0.0
-        final_projected_revenue = projected_revenue_before_discount
+def largest_event_info(largest_event, guest_count, discount_amount, final_projected_revenue,total_events,total_guests, total_projected_revenue, total_discount_amount
+):
+    total_events += 1
+    total_guests += guest_count
+    total_projected_revenue += final_projected_revenue
+    total_discount_amount += discount_amount
 
-        # Large events receive a 20% discount.
-        if guest_count >= LARGE_GUEST_AMOUNT:
-            discount_amount = projected_revenue_before_discount * (
-                1 - LARGE_GUEST_DISCOUNT_PERCENT
-            )
-            final_projected_revenue = (
-                projected_revenue_before_discount * LARGE_GUEST_DISCOUNT_PERCENT
-            )
+    if guest_count > largest_event:
+        largest_event = guest_count
+    return total_events,total_guests,total_projected_revenue,total_discount_amount,largest_event
 
-            print(
-                f"{event_name} receives a {discount_amount:,.2f} discount "
-                "because it is a large event."
-            )
-
-        total_events += 1
-        total_guests += guest_count
-        total_projected_revenue += final_projected_revenue
-        total_discount_amount += discount_amount
-
-        if guest_count > largest_event:
-            largest_event = guest_count
-
-        # Store each event so pandas can display the event data later.
-        events.append(
-            {
-                "Event Name": event_name,
-                "Guests": guest_count,
-                "Revenue Before Discount": projected_revenue_before_discount,
-                "Discount Amount": discount_amount,
-                "Final Projected Revenue": final_projected_revenue,
-            }
-        )
-
-    if total_events > 0:
-        average_guests = total_guests / total_events
-        average_revenue = total_projected_revenue / total_events
-    else:
-        average_guests = 0
-        average_revenue = 0
-
+def print_details(total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event, events, average_guests, average_revenue):
     event_dataframe = pd.DataFrame(events)
 
     print("\nEvent Data")
@@ -155,6 +109,72 @@ Average Revenue Per Event: ${average_revenue:,.2f}
 Largest Event: {largest_event:,} Guests
 {"-" * 65}
 """)
+
+def main():
+    total_events = 0
+    total_guests = 0
+    total_projected_revenue = 0.0
+    total_discount_amount = 0.0
+    largest_event = 0
+
+    events = []
+
+    LARGE_GUEST_AMOUNT = 60
+    LARGE_GUEST_DISCOUNT_PERCENT = 0.80  # Customer pays 80%.
+
+    while True:
+        event_name = get_event_information()
+
+        if event_name.lower() == "done":
+            break
+
+        guest_count = -1
+        projected_revenue_before_discount = -1.0
+
+        # Every booking must include a valid guest count.
+        guest_count = get_client_information(guest_count)
+
+        # Assumption: the user enters the booking total before any discount is applied.
+        projected_revenue_before_discount = calculate_event_charge(projected_revenue_before_discount)
+
+        discount_amount = 0.0
+        final_projected_revenue = projected_revenue_before_discount
+
+        # Large events receive a 20% discount.
+        if guest_count >= LARGE_GUEST_AMOUNT:
+            discount_amount = projected_revenue_before_discount * (
+                1 - LARGE_GUEST_DISCOUNT_PERCENT
+            )
+            final_projected_revenue = (
+                projected_revenue_before_discount * LARGE_GUEST_DISCOUNT_PERCENT
+            )
+
+            print(
+                f"{event_name} receives a {discount_amount:,.2f} discount "
+                "because it is a large event."
+            )
+
+        total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event = largest_event_info(largest_event, guest_count, discount_amount, final_projected_revenue,total_events,total_guests, total_projected_revenue, total_discount_amount)
+
+        # Store each event so pandas can display the event data later.
+        events.append(
+            {
+                "Event Name": event_name,
+                "Guests": guest_count,
+                "Revenue Before Discount": projected_revenue_before_discount,
+                "Discount Amount": discount_amount,
+                "Final Projected Revenue": final_projected_revenue,
+            }
+        )
+
+    if total_events > 0:
+        average_guests = total_guests / total_events
+        average_revenue = total_projected_revenue / total_events
+    else:
+        average_guests = 0
+        average_revenue = 0
+
+    print_details(total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event, events, average_guests, average_revenue)
 
 
 if __name__ == "__main__":
