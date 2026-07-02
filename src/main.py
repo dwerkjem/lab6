@@ -32,22 +32,24 @@ Main loop:
 
 import pandas as pd
 
+
 def get_event_information():
     event_name = input(
-            "What is the name of your event?\nEnter a name or done to quit: "
-        ).strip()
-    
+        "What is the name of your event?\nEnter a name or done to quit: "
+    ).strip()
+
     return event_name
-   
+
+
 def get_client_information(guest_count):
     while guest_count <= 0:
         try:
             guest_count = int(
-                    input(
-                        "\nHow many guests are attending the event?\n"
-                        "Enter a positive integer, eg. 53: "
-                    )
+                input(
+                    "\nHow many guests are attending the event?\n"
+                    "Enter a positive integer, eg. 53: "
                 )
+            )
 
             if guest_count <= 0:
                 print("Guest count must be greater than zero.")
@@ -56,15 +58,16 @@ def get_client_information(guest_count):
             print("Please enter a valid whole number for guest count.")
     return guest_count
 
+
 def calculate_event_charge(projected_revenue_before_discount):
     while projected_revenue_before_discount < 0:
         try:
             projected_revenue_before_discount = float(
-                    input(
-                        "\nHow much revenue do you estimate before discounts?\n"
-                        "Enter a number, eg. 53.50: "
-                    )
+                input(
+                    "\nHow much revenue do you estimate before discounts?\n"
+                    "Enter a number, eg. 53.50: "
                 )
+            )
 
             if projected_revenue_before_discount < 0:
                 print("Projected revenue cannot be negative.")
@@ -73,7 +76,16 @@ def calculate_event_charge(projected_revenue_before_discount):
             print("Please enter a valid number for projected revenue.")
     return projected_revenue_before_discount
 
-def largest_event_info(largest_event, guest_count, discount_amount, final_projected_revenue,total_events,total_guests, total_projected_revenue, total_discount_amount
+
+def largest_event_info(
+    largest_event,
+    guest_count,
+    discount_amount,
+    final_projected_revenue,
+    total_events,
+    total_guests,
+    total_projected_revenue,
+    total_discount_amount,
 ):
     total_events += 1
     total_guests += guest_count
@@ -82,9 +94,25 @@ def largest_event_info(largest_event, guest_count, discount_amount, final_projec
 
     if guest_count > largest_event:
         largest_event = guest_count
-    return total_events,total_guests,total_projected_revenue,total_discount_amount,largest_event
+    return (
+        total_events,
+        total_guests,
+        total_projected_revenue,
+        total_discount_amount,
+        largest_event,
+    )
 
-def print_details(total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event, events, average_guests, average_revenue):
+
+def print_details(
+    total_events,
+    total_guests,
+    total_projected_revenue,
+    total_discount_amount,
+    largest_event,
+    events,
+    average_guests,
+    average_revenue,
+):
     event_dataframe = pd.DataFrame(events)
 
     print("\nEvent Data")
@@ -109,6 +137,7 @@ Average Revenue Per Event: ${average_revenue:,.2f}
 Largest Event: {largest_event:,} Guests
 {"-" * 65}
 """)
+
 
 def main():
     total_events = 0
@@ -135,7 +164,9 @@ def main():
         guest_count = get_client_information(guest_count)
 
         # Assumption: the user enters the booking total before any discount is applied.
-        projected_revenue_before_discount = calculate_event_charge(projected_revenue_before_discount)
+        projected_revenue_before_discount = calculate_event_charge(
+            projected_revenue_before_discount
+        )
 
         discount_amount = 0.0
         final_projected_revenue = projected_revenue_before_discount
@@ -154,7 +185,22 @@ def main():
                 "because it is a large event."
             )
 
-        total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event = largest_event_info(largest_event, guest_count, discount_amount, final_projected_revenue,total_events,total_guests, total_projected_revenue, total_discount_amount)
+        (
+            total_events,
+            total_guests,
+            total_projected_revenue,
+            total_discount_amount,
+            largest_event,
+        ) = largest_event_info(
+            largest_event,
+            guest_count,
+            discount_amount,
+            final_projected_revenue,
+            total_events,
+            total_guests,
+            total_projected_revenue,
+            total_discount_amount,
+        )
 
         # Store each event so pandas can display the event data later.
         events.append(
@@ -174,7 +220,16 @@ def main():
         average_guests = 0
         average_revenue = 0
 
-    print_details(total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event, events, average_guests, average_revenue)
+    print_details(
+        total_events,
+        total_guests,
+        total_projected_revenue,
+        total_discount_amount,
+        largest_event,
+        events,
+        average_guests,
+        average_revenue,
+    )
 
 
 if __name__ == "__main__":
