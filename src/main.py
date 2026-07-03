@@ -31,7 +31,6 @@ Main loop:
 """
 
 import pandas as pd
-import os
 
 
 def get_event_information():
