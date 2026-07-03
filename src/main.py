@@ -31,6 +31,8 @@ Main loop:
 """
 
 import pandas as pd
+import os
+
 
 def get_event_information():
     event_name = input(
@@ -73,7 +75,7 @@ def calculate_event_charge(projected_revenue_before_discount):
             print("Please enter a valid number for projected revenue.")
     return projected_revenue_before_discount
 
-def largest_event_info(largest_event, guest_count, discount_amount, final_projected_revenue,total_events,total_guests, total_projected_revenue, total_discount_amount
+def largest_event_info(largest_event, guest_count, discount_amount, final_projected_revenue, total_events,total_guests, total_projected_revenue, total_discount_amount
 ):
     total_events += 1
     total_guests += guest_count
@@ -82,7 +84,7 @@ def largest_event_info(largest_event, guest_count, discount_amount, final_projec
 
     if guest_count > largest_event:
         largest_event = guest_count
-    return total_events,total_guests,total_projected_revenue,total_discount_amount,largest_event
+    return total_events, total_guests,total_projected_revenue, total_discount_amount, largest_event
 
 def print_details(total_events, total_guests, total_projected_revenue, total_discount_amount, largest_event, events, average_guests, average_revenue):
     event_dataframe = pd.DataFrame(events)
